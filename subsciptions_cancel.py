@@ -1,24 +1,10 @@
+# Google Client libraries for authentication and API calls
 from google.oauth2 import service_account
-# Documentation for authenticating server-to-server applications to use Google Client APIs:
-# https://developers.google.com/android-publisher/
-# https://developers.google.com/android-publisher/getting_started
-
-import googleapiclient.discovery
-# Documentation for the Google API Python Client (methods for accessing PlayStore APIs):
-# https://github.com/googleapis/google-api-python-client
-# https://github.com/googleapis/google-api-python-client/tree/master/docs
-# https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.subscriptions
-# https://googleapis.github.io/google-api-python-client/docs/dyn/androidpublisher_v3.html
-
+from googleapiclient.discovery import build
+# Pandas library, used for loading csv into process and then adding data based on API response. 
 import pandas
-# Documentation for Pandas (used for reading and writing to CSV files and iterating through data using Pandas dataframe)
-# https://pandas.pydata.org/docs/user_guide/io.html#csv-text-files
-# https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame
-# https://realpython.com/python-csv/#reading-csv-files-with-pandas 
-
+# For timestamping during processing
 import time
-# Documentation for the Python Time functions (for setting timestamps when logging):
-# https://docs.python.org/3/library/time
 
 timestr = time.strftime("%Y%m%d-%H%M%S")
 print(timestr)
@@ -30,7 +16,7 @@ SERVICE_ACCOUNT_FILE = './config/config.json'
 credentials = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 
 # INITIALISE CSV
-df = pandas.read_csv('./inputs/subs_to_cancel.csv')
+df = pandas.read_csv('./inputs/subs_to_get.csv')
 # ADD ADDITIONAL COLUMNS TO PANDAS DATAFRAME, WILL BE POPULATED USING THE GOOGLE CLIENT API
 df['start_time'] = ''
 df['end_time'] = ''
@@ -49,11 +35,11 @@ for i in df.index:
 
         startTime = time.strftime("%Y%m%d-%H%M%S")
 
-        PlayStore_subscriptionId = df.loc[i,'google_play_product_id'] 
-        PlayStore_packageName = df.loc[i,'google_play_package_name']
-        PlayStore_token = df.loc[i,'token']
+        PlayStore_subscriptionId = df.loc[i,'PlayStore_subscriptionId'] 
+        PlayStore_packageName = df.loc[i,'PlayStore_packageName']
+        PlayStore_token = df.loc[i,'PlayStore_token']
 
-        androidPublisherService = googleapiclient.discovery.build('androidpublisher', 'v3', credentials=credentials)
+        androidPublisherService = build('androidpublisher', 'v3', credentials=credentials)
 
         try:
                 response = androidPublisherService.purchases().subscriptions().cancel(
