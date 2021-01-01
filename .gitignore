@@ -1,0 +1,5 @@
+*.xlsx
+*.cer
+/outputs/*.csv
+/venv/*
+.*/
